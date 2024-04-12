@@ -65,24 +65,13 @@ public class CustomMutexTests
 public class PoseHandleTests
 {
     [Test]
-    public void TestPoseHandleDispose()
+    public void AccessDisposedHandleThrowsException()
     {
-        IntPtr handle = new IntPtr(123);
-        PoseHandle poseHandle = new PoseHandle(handle);
-
-        poseHandle.Dispose();
+        var handle = new PoseHandle(IntPtr.Zero);
         
-        Assert.AreEqual(IntPtr.Zero, poseHandle.Handle);
-    }
-
-    [Test]
-    public void TestPoseHandleReleaseHandle()
-    {
-        IntPtr handle = new IntPtr(123);
-        PoseHandle poseHandle = new PoseHandle(handle);
-
-        poseHandle.ReleaseHandle();
+        handle.Dispose();
         
-        Assert.AreEqual(IntPtr.Zero, poseHandle.Handle);
+        TestDelegate testDelegate = () => { var test = handle.Handle; };
+        Assert.Throws<ObjectDisposedException>(testDelegate);
     }
 }

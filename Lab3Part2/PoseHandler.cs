@@ -13,7 +13,14 @@ public class PoseHandle : IDisposable
 
     public IntPtr Handle
     {
-        get { return handle; }
+        get
+        {
+            if (!disposed)
+                return handle;
+            else
+                throw new ObjectDisposedException(ToString());
+        }
+
         set { handle = value; }
     }
     
