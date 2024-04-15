@@ -1,21 +1,18 @@
 ﻿public class CustomMutex
 {
-    private int locked = 0; 
-
+    private Thread thread;
     public void Lock()
     {
-        while (true)
-        {
-            if (Interlocked.CompareExchange(ref locked, 1, 0) == 0)
-            {
-                return;
-            }
-            Thread.Sleep(10);
-        }
+        Thread t = Thread.CurrentThread;
+        while (Interlocked.CompareExchange(ref thread, t, null) != null)
+            Thread.Yield();
+        Thread.MemoryBarrier();
     }
-
     public void Unlock()
     {
-        Interlocked.Exchange(ref locked, 0);
+        Thread t = Thread.CurrentThread;
+        if (Interlocked.CompareExchange(ref thread, null, t) != t)
+            throw new SynchronizationLockException();
+        Thread.MemoryBarrier();
     }
 }

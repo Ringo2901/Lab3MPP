@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Lab3Tests;
 
 [TestFixture]
@@ -21,7 +23,7 @@ public class CustomMutexTests
     {
         CustomMutex mutex = new CustomMutex();
         
-        mutex.Unlock();
+        Assert.Throws<SynchronizationLockException>(() => mutex.Unlock());
     }
 
     [Test]
@@ -56,8 +58,7 @@ public class CustomMutexTests
     }
     private bool IsMutexLocked(CustomMutex mutex)
     {
-        var lockedField = typeof(CustomMutex).GetField("locked", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        return (int)lockedField.GetValue(mutex) == 1;
+        return mutex.GetType().GetField("thread", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(mutex) != null;
     }
 }
 
